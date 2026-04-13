@@ -4,11 +4,12 @@ import com.guicedee.client.IGuiceContext;
 import com.guicedee.faulttolerance.FaultToleranceOptions;
 import com.guicedee.faulttolerance.implementations.CircuitBreakerInterceptor;
 import com.guicedee.faulttolerance.implementations.FaultTolerancePreStartup;
-import org.eclipse.microprofile.faulttolerance.*;
 import org.eclipse.microprofile.faulttolerance.exceptions.BulkheadException;
 import org.eclipse.microprofile.faulttolerance.exceptions.CircuitBreakerOpenException;
 import org.eclipse.microprofile.faulttolerance.exceptions.TimeoutException;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -167,112 +168,4 @@ public class FaultToleranceIntegrationTest {
         Assertions.assertEquals(1000, options.timeoutValue());
         Assertions.assertEquals(0.5, options.circuitBreakerFailureRatio());
     }
-
-    // ===================== Test Service Classes =====================
-
-    public static class RetryService {
-        private final AtomicInteger counter = new AtomicInteger(0);
-
-        @Retry(maxRetries = 3, delay = 0)
-        public String eventuallySucceeds() {
-            int attempt = counter.incrementAndGet();
-            if (attempt < 3) {
-                throw new RuntimeException("Attempt " + attempt + " failed");
-            }
-            return "success";
-        }
-
-        @Retry(maxRetries = 2, delay = 0)
-        public String alwaysFails() {
-            throw new RuntimeException("Always fails");
-        }
-
-        public void resetCounter() {
-            counter.set(0);
-        }
-
-        public int getAttemptCount() {
-            return counter.get();
-        }
-    }
-
-    public static class TimeoutService {
-        @Timeout(value = 100, unit = java.time.temporal.ChronoUnit.MILLIS)
-        public String slowMethod() {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            return "slow";
-        }
-
-        @Timeout(value = 5000, unit = java.time.temporal.ChronoUnit.MILLIS)
-        public String fastMethod() {
-            return "fast";
-        }
-    }
-
-    public static class FallbackService {
-        @Fallback(fallbackMethod = "fallback")
-        public String riskyMethod() {
-            throw new RuntimeException("Method failed");
-        }
-
-        public String fallback() {
-            return "fallback-value";
-        }
-    }
-
-    public static class BulkheadService {
-        private CountDownLatch insideLatch;
-        private CountDownLatch blockLatch;
-
-        public void setLatches(CountDownLatch insideLatch, CountDownLatch blockLatch) {
-            this.insideLatch = insideLatch;
-            this.blockLatch = blockLatch;
-        }
-
-        @Bulkhead(2)
-        public String limitedMethod() {
-            if (insideLatch != null) {
-                insideLatch.countDown();
-            }
-            try {
-                if (blockLatch != null) {
-                    blockLatch.await(10, TimeUnit.SECONDS);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            return "ok";
-        }
-    }
-
-    public static class CircuitBreakerService {
-        @CircuitBreaker(requestVolumeThreshold = 4, failureRatio = 0.5, delay = 60000)
-        public String fragileMethod() {
-            throw new RuntimeException("Service down");
-        }
-    }
-
-    public static class AsyncService {
-        @Asynchronous
-        public CompletableFuture<String> asyncMethod() {
-            return CompletableFuture.completedFuture("async-result");
-        }
-    }
-
-    public static class ComposedService {
-        @Retry(maxRetries = 2, delay = 0)
-        @Fallback(fallbackMethod = "composedFallback")
-        public String retryThenFallback() {
-            throw new RuntimeException("Always fails");
-        }
-
-        public String composedFallback() {
-            return "composed-fallback";
-        }
-    }
 }
-
