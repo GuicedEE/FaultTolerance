@@ -27,7 +27,7 @@ Built on [MicroProfile Fault Tolerance](https://github.com/eclipse/microprofile-
 <summary>Gradle (Kotlin DSL)</summary>
 
 ```kotlin
-implementation("com.guicedee:fault-tolerance:2.0.0-RC4")
+implementation("com.guicedee:fault-tolerance:2.0.0-RC5")
 ```
 </details>
 
