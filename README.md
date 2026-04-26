@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/GuicedEE/FaultTolerance/actions/workflows/build.yml/badge.svg)](https://github.com/GuicedEE/FaultTolerance/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.guicedee/fault-tolerance)](https://central.sonatype.com/artifact/com.guicedee/fault-tolerance)
-[![Maven Snapshot](https://img.shields.io/nexus/s/com.guicedee/fault-tolerance?server=https%3A%2F%2Foss.sonatype.org&label=Maven%20Snapshot)](https://oss.sonatype.org/content/repositories/snapshots/com/guicedee/fault-tolerance/)
+[![Snapshot](https://img.shields.io/badge/Snapshot-2.0.0-SNAPSHOT-orange)](https://github.com/GuicedEE/Packages/packages/maven/com.guicedee.fault-tolerance)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
 
 ![Java 25+](https://img.shields.io/badge/Java-25%2B-green)
@@ -223,29 +223,42 @@ Environment variables take precedence over annotation values.
 
 ## 📐 Startup Flow
 
-```
-IGuiceContext.instance()
- └─ IGuicePreStartup hooks
-     └─ FaultTolerancePreStartup.onStartup() (sortOrder = MIN_VALUE + 45)
-         └─ Scan for @FaultToleranceOptions via ClassGraph
- └─ Guice injector created
-     └─ FaultToleranceModule.configure()
-         ├─ bindInterceptor for @Retry → RetryInterceptor
-         ├─ bindInterceptor for @Timeout → TimeoutInterceptor
-         ├─ bindInterceptor for @CircuitBreaker → CircuitBreakerInterceptor
-         ├─ bindInterceptor for @Bulkhead → BulkheadInterceptor
-         ├─ bindInterceptor for @Fallback → FallbackInterceptor
-         └─ bindInterceptor for @Asynchronous → AsynchronousInterceptor
+```mermaid
+flowchart TD
+    n1["IGuiceContext.instance()"]
+    n2["IGuicePreStartup hooks"]
+    n1 --> n2
+    n3["FaultTolerancePreStartup.onStartup()<br/>sortOrder = MIN_VALUE + 45"]
+    n2 --> n3
+    n4["Scan for @FaultToleranceOptions via ClassGraph"]
+    n3 --> n4
+    n5["Guice injector created"]
+    n1 --> n5
+    n6["FaultToleranceModule.configure()"]
+    n5 --> n6
+    n7["bindInterceptor for @Retry → RetryInterceptor"]
+    n6 --> n7
+    n8["bindInterceptor for @Timeout → TimeoutInterceptor"]
+    n6 --> n8
+    n9["bindInterceptor for @CircuitBreaker → CircuitBreakerInterceptor"]
+    n6 --> n9
+    n10["bindInterceptor for @Bulkhead → BulkheadInterceptor"]
+    n6 --> n10
+    n11["bindInterceptor for @Fallback → FallbackInterceptor"]
+    n6 --> n11
+    n12["bindInterceptor for @Asynchronous → AsynchronousInterceptor"]
+    n6 --> n12
 ```
 
 ## 🗺️ Module Graph
 
-```
-com.guicedee.faulttolerance
- ├── com.guicedee.guicedinjection   (GuicedEE runtime — scanning, Guice, lifecycle)
- ├── com.guicedee.client            (GuicedEE client — IGuiceContext, Environment)
- ├── com.google.guice               (Guice — AOP, AbstractModule, Matchers)
- └── com.guicedee.modules.services.faulttolerance  (MicroProfile Fault Tolerance API — annotations)
+```mermaid
+flowchart LR
+    com_guicedee_faulttolerance["com.guicedee.faulttolerance"]
+    com_guicedee_faulttolerance --> com_guicedee_guicedinjection["com.guicedee.guicedinjection<br/>GuicedEE runtime — scanning, Guice, lifecycle"]
+    com_guicedee_faulttolerance --> com_guicedee_client["com.guicedee.client<br/>GuicedEE client — IGuiceContext, Environment"]
+    com_guicedee_faulttolerance --> com_google_guice["com.google.guice<br/>Guice — AOP, AbstractModule, Matchers"]
+    com_guicedee_faulttolerance --> com_guicedee_modules_services_faulttolerance["com.guicedee.modules.services.faulttolerance<br/>MicroProfile Fault Tolerance API — annotations"]
 ```
 
 ## 🧩 JPMS
