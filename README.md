@@ -2,12 +2,10 @@
 
 [![Build](https://github.com/GuicedEE/FaultTolerance/actions/workflows/build.yml/badge.svg)](https://github.com/GuicedEE/FaultTolerance/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.guicedee/fault-tolerance)](https://central.sonatype.com/artifact/com.guicedee/fault-tolerance)
-[![Snapshot](https://img.shields.io/badge/Snapshot-2.0.1-SNAPSHOT-SNAPSHOT-orange)](https://github.com/GuicedEE/Packages/packages/maven/com.guicedee.fault-tolerance)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)
 
 ![Java 25+](https://img.shields.io/badge/Java-25%2B-green)
 ![Guice 7](https://img.shields.io/badge/Guice-7%2B-green)
-![Maven 4](https://img.shields.io/badge/Maven-4%2B-green)
 
 Seamless **MicroProfile Fault Tolerance** integration for [GuicedEE](https://github.com/GuicedEE) applications using **Guice AOP interceptors**.
 Annotate your methods with standard `@Retry`, `@Timeout`, `@CircuitBreaker`, `@Bulkhead`, `@Fallback`, and `@Asynchronous` — fault tolerance behavior is applied automatically via Guice method interception.
