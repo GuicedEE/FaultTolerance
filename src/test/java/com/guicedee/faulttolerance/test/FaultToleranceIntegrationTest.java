@@ -90,14 +90,14 @@ public class FaultToleranceIntegrationTest {
         ExecutorService exec = Executors.newFixedThreadPool(3);
 
         // Launch 2 concurrent calls (bulkhead value = 2)
-        Future<?> f1 = exec.submit(() -> service.limitedMethod());
-        Future<?> f2 = exec.submit(() -> service.limitedMethod());
+        Future<?> f1 = exec.submit(service::limitedMethod);
+        Future<?> f2 = exec.submit(service::limitedMethod);
 
         // Wait until both are inside the method
         insideLatch.await(5, TimeUnit.SECONDS);
 
         // Third call should be rejected
-        Future<?> f3 = exec.submit(() -> service.limitedMethod());
+        Future<?> f3 = exec.submit(service::limitedMethod);
 
         try {
             f3.get(5, TimeUnit.SECONDS);
