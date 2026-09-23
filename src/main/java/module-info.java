@@ -9,9 +9,7 @@
  */
 module com.guicedee.faulttolerance {
     requires transitive com.guicedee.guicedinjection;
-    requires transitive com.guicedee.client;
     requires transitive com.guicedee.modules.services.faulttolerance;
-    requires transitive com.google.guice;
 
     exports com.guicedee.faulttolerance;
     exports com.guicedee.faulttolerance.implementations;
