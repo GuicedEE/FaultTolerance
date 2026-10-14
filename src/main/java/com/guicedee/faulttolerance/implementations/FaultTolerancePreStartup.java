@@ -1,5 +1,7 @@
 package com.guicedee.faulttolerance.implementations;
 
+import com.guicedee.client.utils.ClassLoading;
+
 import com.guicedee.client.IGuiceContext;
 import com.guicedee.client.services.lifecycle.IGuicePreStartup;
 import com.guicedee.faulttolerance.FaultToleranceOptions;
@@ -34,7 +36,7 @@ public class FaultTolerancePreStartup implements IGuicePreStartup<FaultTolerance
         var scanResult = IGuiceContext.instance().getScanResult();
         var classes = scanResult.getClassesWithAnnotation(FaultToleranceOptions.class);
         if (!classes.isEmpty()) {
-            var clazz = classes.getFirst().loadClass();
+            var clazz = ClassLoading.loadClass(classes.getFirst());
             FaultToleranceOptions annotation = clazz.getAnnotation(FaultToleranceOptions.class);
             options = new FaultToleranceOptions() {
                 @Override
